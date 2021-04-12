@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express        = require("express");
 const session        = require("express-session");
 const MongoStore     = require("connect-mongo")(session);
@@ -14,7 +15,11 @@ const siteController     = require("./routes/siteController");
 const locationController = require("./routes/locationController");
 
 // Mongoose configuration
-mongoose.connect("mongodb://localhost/deploy-exercise");
+//mongoose.connect("mongodb://localhost/deploy-exercise");
+mongoose.connect(process.env.MONGODB_URI,{
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
 
 // Middlewares configuration
 app.use(logger("dev"));
@@ -33,6 +38,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Authentication
 app.use(session({
   secret: "deploy-exercise",
+  resave: true,
+  saveUninitialized: true,
   cookie: { maxAge: 60000 },
   store: new MongoStore({
     mongooseConnection: mongoose.connection,
